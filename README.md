@@ -25,102 +25,195 @@ Lorsque XProd passe une commande à une certaine date à un fournisseur, elle es
 >Chaque données est classée par rapport a chaque entité avec son type, sa longueur, et est ce qu'il est élémentaire ou alors calculé (dans certains cas).
 
 
-![alt text](image-1.png)
+![alt text](image-7.png)
 
 ### Ensuite voici mon `Modèle Conceptuel des Données`
 
-![alt text](ex1_mcd.png)
-
-
-> _J'ai du rajouter une relation refletive a la main car on ne pouvais pas l'ajouter sur Jmerise._
+![alt text](image-5.png)
 
 
 ### Voici le `Modèle Logique des Données` :
 
-![alt text](image.png)
+![alt text](image-6.png)
 
-### La relation : 
+### La relation (MLRD): 
 
 ```r
-Produits (  #ref_xprod,   Désignation,   Déscription,   Prix_unitaire,   Type_produit  )
+Produits  (  #id_produits,   nom_produit,   description_produit,   Prix,   id_usine_Fabrication XPROD  )
 
-Fournisseur (  #id_Fournisseur,   nom_fournisseur,   raison_sociale_fournisseur,   adresse_fournisseur,   codepostal_fournisseur,   ville_fournisseur,   pays_fournisseur  )
+Commande (  #id_commande,   date_commande,   date_livraison_commande  )
 
-Commande (  #id_Commande,   Date_Commande,   id_Fournisseur_Fournisseur  )
+Client (  #id_client,   nom_client,   prenom_client,   adress_client,   ville_client,   code_postal_client,   pays_client  )
 
-Approvisionnement ext (  #id_approvisionnement_facture,   prix_ht  )
+Fournisseur (  #id_fournisseur,   nom_fournisseur  )
 
-Lignes de commande (  #id_ligne_commande,   quantité,   prix_ht,   date_livraison,   id_Commande_Commande,   id_approvisionnement_facture_Approvisionnement ext  )
+Ligne de commande (  #id_ligne_de_commande,   quantité,   prix_ht,   id_usine_Fabrication XPROD  )
 
-Fournis (  #id_Fournisseur_Fournisseur,    #id_approvisionnement_facture_Approvisionnement ext  )
+Fabrication XPROD (  #id_usine  )
 
-Approvisionne  (  #id_approvisionnement_facture_Approvisionnement ext,    #ref_xprod_Produits  )
+SERVICE LIVRAISON (  #id_bon_livraison,   libellé_livraison  )
+
+Contient ( Quantité,    #id_commande_Commande,    #id_ligne_de_commande_Ligne de commande  )
+
+PRODUIRE (  #id_fournisseur_Fournisseur,    #id_produits_Produits   )
+
+COMMANDER (  #id_client_Client,    #id_commande_Commande  )
+
+ENVOYER (  #id_produits_Produits ,    #id_bon_livraison_SERVICE LIVRAISON  )
+
+LIVRAISON (  #id_bon_livraison_SERVICE LIVRAISON,    #id_client_Client  )
+
+ENVOYER2 (  #id_fournisseur_Fournisseur,    #id_bon_livraison_SERVICE LIVRAISON  )
 ```
 
-### Et pour finir voici le modele physique qui permet d'etre importé dans un GDBDD `(Gestionnaire de base de donnée)` comme **Mysql** que j'utilise. 
+### Et pour finir voici le modele physique qui permet d'etre importé dans un GDBDD `(Gestionnaire de base de donnée)` comme **Mysql** que j'utilise fournis par JMERISE. (il ne peux pas être executé 😂)
 
 ```sql
+#Ma base de données : 
+
+DROP TABLE IF EXISTS Produits ;
 CREATE TABLE Produits (
-    ref_xprod INT AUTO_INCREMENT,
-    Désignation TEXT,
-    Déscription TEXT,
-    Prix_unitaire FLOAT,
-    Type_produit TEXT,
-    PRIMARY KEY (ref_xprod)
-) ENGINE=InnoDB;
+        id_produits     Auto_increment (25),
+        nom_produit     Text (25),
+        description_produit     Text (25),
+        Prix     Float (25),
+        id_usine_Fabrication XPROD     Auto_increment (25),
+        PRIMARY KEY (id_produits)
+)ENGINE=InnoDB;
 
-CREATE TABLE Fournisseur (
-    id_Fournisseur INT AUTO_INCREMENT,
-    nom_fournisseur TEXT,
-    raison_sociale_fournisseur TEXT,
-    adresse_fournisseur TEXT,
-    codepostal_fournisseur INT,
-    ville_fournisseur TEXT,
-    pays_fournisseur TEXT,
-    PRIMARY KEY (id_Fournisseur)
-) ENGINE=InnoDB;
 
-CREATE TABLE Commande (
-    id_Commande INT AUTO_INCREMENT,
-    Date_Commande DATE,
-    id_Fournisseur_Fournisseur INT,
-    PRIMARY KEY (id_Commande),
-    FOREIGN KEY (id_Fournisseur_Fournisseur) REFERENCES Fournisseur(id_Fournisseur)
-) ENGINE=InnoDB;
 
-CREATE TABLE `Approvisionnement ext` (
-    id_approvisionnement_facture INT AUTO_INCREMENT,
-    prix_ht FLOAT,
-    PRIMARY KEY (id_approvisionnement_facture)
-) ENGINE=InnoDB;
+DROP TABLE IF EXISTS Commande;
+CREATE TABLE Commande(
+        id_commande     Auto_increment (25),
+        date_commande     Date (25),
+        date_livraison_commande     Date (25),
+        PRIMARY KEY (id_commande)
+)ENGINE=InnoDB;
 
-CREATE TABLE `Lignes de commande` (
-    id_ligne_commande INT AUTO_INCREMENT,
-    quantité INT,
-    prix_ht FLOAT,
-    date_livraison DATE,
-    id_Commande_Commande INT,
-    id_approvisionnement_facture_Approvisionnement_ext INT,
-    PRIMARY KEY (id_ligne_commande),
-    FOREIGN KEY (id_Commande_Commande) REFERENCES Commande(id_Commande),
-    FOREIGN KEY (id_approvisionnement_facture_Approvisionnement_ext) REFERENCES `Approvisionnement ext`(id_approvisionnement_facture)
-) ENGINE=InnoDB;
 
-CREATE TABLE Fournis (
-    id_Fournisseur_Fournisseur INT,
-    id_approvisionnement_facture_Approvisionnement_ext INT,
-    PRIMARY KEY (id_Fournisseur_Fournisseur, id_approvisionnement_facture_Approvisionnement_ext),
-    FOREIGN KEY (id_Fournisseur_Fournisseur) REFERENCES Fournisseur(id_Fournisseur),
-    FOREIGN KEY (id_approvisionnement_facture_Approvisionnement_ext) REFERENCES `Approvisionnement ext`(id_approvisionnement_facture)
-) ENGINE=InnoDB;
 
-CREATE TABLE Approvisionne (
-    id_approvisionnement_facture_Approvisionnement_ext INT,
-    ref_xprod_Produits INT,
-    PRIMARY KEY (id_approvisionnement_facture_Approvisionnement_ext, ref_xprod_Produits),
-    FOREIGN KEY (id_approvisionnement_facture_Approvisionnement_ext) REFERENCES `Approvisionnement ext`(id_approvisionnement_facture),
-    FOREIGN KEY (ref_xprod_Produits) REFERENCES Produits(ref_xprod)
-) ENGINE=InnoDB;
+DROP TABLE IF EXISTS Client;
+CREATE TABLE Client(
+        id_client     Auto_increment (25),
+        nom_client     Text (25),
+        prenom_client     Text (25),
+        adress_client     Varchar (100),
+        ville_client     Text (25),
+        code_postal_client     Numeric (6),
+        pays_client     Text (25),
+        PRIMARY KEY (id_client)
+)ENGINE=InnoDB;
+
+
+
+DROP TABLE IF EXISTS Fournisseur;
+CREATE TABLE Fournisseur(
+        id_fournisseur     Auto_increment (25),
+        nom_fournisseur     Text (25),
+        PRIMARY KEY (id_fournisseur)
+)ENGINE=InnoDB;
+
+
+
+DROP TABLE IF EXISTS Ligne de commande;
+CREATE TABLE Ligne de commande(
+        id_ligne_de_commande     Auto_increment (25),
+        quantité     Float (25,2),
+        prix_ht     Float (25),
+        id_usine_Fabrication XPROD     Auto_increment (25),
+        PRIMARY KEY (id_ligne_de_commande)
+)ENGINE=InnoDB;
+
+
+
+DROP TABLE IF EXISTS Fabrication XPROD;
+CREATE TABLE Fabrication XPROD(
+        id_usine     Auto_increment (25),
+        PRIMARY KEY (id_usine)
+)ENGINE=InnoDB;
+
+
+
+DROP TABLE IF EXISTS SERVICE LIVRAISON;
+CREATE TABLE SERVICE LIVRAISON(
+        id_bon_livraison     Auto_increment (25),
+        libellé_livraison     Text (100),
+        PRIMARY KEY (id_bon_livraison)
+)ENGINE=InnoDB;
+
+
+
+DROP TABLE IF EXISTS Contient;
+CREATE TABLE Contient(
+        Quantité     Float (25),
+        id_commande_Commande     Auto_increment (25),
+        id_ligne_de_commande_Ligne de commande     Auto_increment (25),
+        PRIMARY KEY (id_commande_Commande,id_ligne_de_commande_Ligne de commande)
+)ENGINE=InnoDB;
+
+
+
+DROP TABLE IF EXISTS PRODUIRE;
+CREATE TABLE PRODUIRE(
+        id_fournisseur_Fournisseur     Auto_increment (25),
+        id_produits_Produits      Auto_increment (25),
+        PRIMARY KEY (id_fournisseur_Fournisseur,id_produits_Produits )
+)ENGINE=InnoDB;
+
+
+
+DROP TABLE IF EXISTS COMMANDER;
+CREATE TABLE COMMANDER(
+        id_client_Client     Auto_increment (25),
+        id_commande_Commande     Auto_increment (25),
+        PRIMARY KEY (id_client_Client,id_commande_Commande)
+)ENGINE=InnoDB;
+
+
+
+DROP TABLE IF EXISTS ENVOYER;
+CREATE TABLE ENVOYER(
+        id_produits_Produits      Auto_increment (25),
+        id_bon_livraison_SERVICE LIVRAISON     Auto_increment (25),
+        PRIMARY KEY (id_produits_Produits ,id_bon_livraison_SERVICE LIVRAISON)
+)ENGINE=InnoDB;
+
+
+
+DROP TABLE IF EXISTS LIVRAISON;
+CREATE TABLE LIVRAISON(
+        id_bon_livraison_SERVICE LIVRAISON     Auto_increment (25),
+        id_client_Client     Auto_increment (25),
+        PRIMARY KEY (id_bon_livraison_SERVICE LIVRAISON,id_client_Client)
+)ENGINE=InnoDB;
+
+
+
+DROP TABLE IF EXISTS ENVOYER2;
+CREATE TABLE ENVOYER2(
+        id_fournisseur_Fournisseur     Auto_increment (25),
+        id_bon_livraison_SERVICE LIVRAISON     Auto_increment (25),
+        PRIMARY KEY (id_fournisseur_Fournisseur,id_bon_livraison_SERVICE LIVRAISON)
+)ENGINE=InnoDB;
+
+
+
+ALTER TABLE Produits  ADD CONSTRAINT FK_Produits _id_usine_Fabrication XPROD FOREIGN KEY (id_usine_Fabrication XPROD) REFERENCES Fabrication XPROD(id_usine)
+ALTER TABLE Ligne de commande ADD CONSTRAINT FK_Ligne de commande_id_usine_Fabrication XPROD FOREIGN KEY (id_usine_Fabrication XPROD) REFERENCES Fabrication XPROD(id_usine)
+ALTER TABLE Contient ADD CONSTRAINT FK_Contient_id_commande_Commande FOREIGN KEY (id_commande_Commande) REFERENCES Commande(id_commande)
+ALTER TABLE Contient ADD CONSTRAINT FK_Contient_id_ligne_de_commande_Ligne de commande FOREIGN KEY (id_ligne_de_commande_Ligne de commande) REFERENCES Ligne de commande(id_ligne_de_commande)
+ALTER TABLE PRODUIRE ADD CONSTRAINT FK_PRODUIRE_id_fournisseur_Fournisseur FOREIGN KEY (id_fournisseur_Fournisseur) REFERENCES Fournisseur(id_fournisseur)
+ALTER TABLE PRODUIRE ADD CONSTRAINT FK_PRODUIRE_id_produits_Produits  FOREIGN KEY (id_produits_Produits ) REFERENCES Produits (id_produits)
+ALTER TABLE COMMANDER ADD CONSTRAINT FK_COMMANDER_id_client_Client FOREIGN KEY (id_client_Client) REFERENCES Client(id_client)
+ALTER TABLE COMMANDER ADD CONSTRAINT FK_COMMANDER_id_commande_Commande FOREIGN KEY (id_commande_Commande) REFERENCES Commande(id_commande)
+ALTER TABLE ENVOYER ADD CONSTRAINT FK_ENVOYER_id_produits_Produits  FOREIGN KEY (id_produits_Produits ) REFERENCES Produits (id_produits)
+ALTER TABLE ENVOYER ADD CONSTRAINT FK_ENVOYER_id_bon_livraison_SERVICE LIVRAISON FOREIGN KEY (id_bon_livraison_SERVICE LIVRAISON) REFERENCES SERVICE LIVRAISON(id_bon_livraison)
+ALTER TABLE LIVRAISON ADD CONSTRAINT FK_LIVRAISON_id_bon_livraison_SERVICE LIVRAISON FOREIGN KEY (id_bon_livraison_SERVICE LIVRAISON) REFERENCES SERVICE LIVRAISON(id_bon_livraison)
+ALTER TABLE LIVRAISON ADD CONSTRAINT FK_LIVRAISON_id_client_Client FOREIGN KEY (id_client_Client) REFERENCES Client(id_client)
+ALTER TABLE ENVOYER2 ADD CONSTRAINT FK_ENVOYER2_id_fournisseur_Fournisseur FOREIGN KEY (id_fournisseur_Fournisseur) REFERENCES Fournisseur(id_fournisseur)
+ALTER TABLE ENVOYER2 ADD CONSTRAINT FK_ENVOYER2_id_bon_livraison_SERVICE LIVRAISON FOREIGN KEY (id_bon_livraison_SERVICE LIVRAISON) REFERENCES SERVICE LIVRAISON(id_bon_livraison)
+
 ```
 
 # ⛹️‍♂️ Examen pratique 2 ⛹️‍♂️
