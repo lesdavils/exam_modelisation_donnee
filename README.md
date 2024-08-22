@@ -1,21 +1,45 @@
- # Examen pratique 1
+ # Examen pratique 1 👨‍🎓
+
+# Sujet
+
+L’entreprise `XProd` fabrique et commercialise divers produits. Ils sont identifiés par une référence propre à XProd et on enregistre une désignation (libellé court), un descriptif (libellé long) et un prix de vente catalogue unitaire hors taxes.
+
+Dans la base de données, elle gère deux types de produits :
+1. `Produits fabriqués` : Pour ces produits, on enregistre le nombre moyen d’heures de main d’œuvre nécessaires à leur fabrication.
+2. `Produits approvisionnés` : Ces produits ne sont pas fabriqués par XProd, mais achetés à un ou plusieurs fournisseurs à un prix d’achat unitaire moyen.
+
+Pour ne pas dépendre d’un fournisseur spécifique, enregistré par sa raison sociale, adresse, etc., l’entreprise a établi une liste de fournisseurs capables de livrer chaque produit approvisionné. Pour un même produit, chaque fournisseur peut avoir sa propre référence et un prix différent.
+
+Lorsque XProd passe une commande à une certaine date à un fournisseur, elle essaie de grouper plusieurs lignes de commande : une par produit dans une certaine quantité avec sa date de livraison prévue, afin de réduire les frais de livraison de la commande et essayer de négocier un prix d’achat unitaire inférieur au prix catalogue du fournisseur.
+
+## Travail à faire
+
+- Créer le dictionnaire de données.
+- Créer le Modèle Conceptuel des Données (MCD).
+-Concevoir le Modèle Logique des Données (MLD).
+- Concevoir le Modèle Physique des Données (MPD).
 
 
-Dictionaire de donnée 
+### Pour commencer voici mon `dictionnaire de données`
+
+>Chaque données est classée par rapport a chaque entité avec son type, sa longueur, et est ce qu'il est élémentaire ou alors calculé (dans certains cas).
 
 
 ![alt text](image-1.png)
 
- ## MCD
+### Ensuite voici mon `Modèle Conceptuel des Données`
 
 ![alt text](ex1_mcd.png)
 
-Voici le MLD 
-: 
+
+> _J'ai du rajouter une relation refletive a la main car on ne pouvais pas l'ajouter sur Jmerise._
+
+
+### Voici le `Modèle Logique des Données` :
 
 ![alt text](image.png)
 
-relationel : 
+### La relation : 
 
 ```r
 Produits (  #ref_xprod,   Désignation,   Déscription,   Prix_unitaire,   Type_produit  )
@@ -32,11 +56,10 @@ Fournis (  #id_Fournisseur_Fournisseur,    #id_approvisionnement_facture_Approvi
 
 Approvisionne  (  #id_approvisionnement_facture_Approvisionnement ext,    #ref_xprod_Produits  )
 ```
-Modele physique 
 
+### Et pour finir voici le modele physique qui permet d'etre importé dans un GDBDD `(Gestionnaire de base de donnée)` comme **Mysql** que j'utilise. 
 
 ```sql
-DROP TABLE IF EXISTS Produits;
 CREATE TABLE Produits (
     ref_xprod INT AUTO_INCREMENT,
     Désignation TEXT,
@@ -46,7 +69,6 @@ CREATE TABLE Produits (
     PRIMARY KEY (ref_xprod)
 ) ENGINE=InnoDB;
 
-DROP TABLE IF EXISTS Fournisseur;
 CREATE TABLE Fournisseur (
     id_Fournisseur INT AUTO_INCREMENT,
     nom_fournisseur TEXT,
@@ -58,7 +80,6 @@ CREATE TABLE Fournisseur (
     PRIMARY KEY (id_Fournisseur)
 ) ENGINE=InnoDB;
 
-DROP TABLE IF EXISTS Commande;
 CREATE TABLE Commande (
     id_Commande INT AUTO_INCREMENT,
     Date_Commande DATE,
@@ -67,14 +88,12 @@ CREATE TABLE Commande (
     FOREIGN KEY (id_Fournisseur_Fournisseur) REFERENCES Fournisseur(id_Fournisseur)
 ) ENGINE=InnoDB;
 
-DROP TABLE IF EXISTS `Approvisionnement ext`;
 CREATE TABLE `Approvisionnement ext` (
     id_approvisionnement_facture INT AUTO_INCREMENT,
     prix_ht FLOAT,
     PRIMARY KEY (id_approvisionnement_facture)
 ) ENGINE=InnoDB;
 
-DROP TABLE IF EXISTS `Lignes de commande`;
 CREATE TABLE `Lignes de commande` (
     id_ligne_commande INT AUTO_INCREMENT,
     quantité INT,
@@ -87,7 +106,6 @@ CREATE TABLE `Lignes de commande` (
     FOREIGN KEY (id_approvisionnement_facture_Approvisionnement_ext) REFERENCES `Approvisionnement ext`(id_approvisionnement_facture)
 ) ENGINE=InnoDB;
 
-DROP TABLE IF EXISTS Fournis;
 CREATE TABLE Fournis (
     id_Fournisseur_Fournisseur INT,
     id_approvisionnement_facture_Approvisionnement_ext INT,
@@ -96,7 +114,6 @@ CREATE TABLE Fournis (
     FOREIGN KEY (id_approvisionnement_facture_Approvisionnement_ext) REFERENCES `Approvisionnement ext`(id_approvisionnement_facture)
 ) ENGINE=InnoDB;
 
-DROP TABLE IF EXISTS Approvisionne;
 CREATE TABLE Approvisionne (
     id_approvisionnement_facture_Approvisionnement_ext INT,
     ref_xprod_Produits INT,
@@ -106,21 +123,21 @@ CREATE TABLE Approvisionne (
 ) ENGINE=InnoDB;
 ```
 
-# Examen pratique 2
+# ⛹️‍♂️ Examen pratique 2 ⛹️‍♂️
 
-Dictionnaire de donnée 
+### Ci-dessous le dictionnaire de données 
 
 ![alt text](image-3.png)
 
-Mcd
+### Puis le MCD
 
 ![alt text](image-2.png)
 
-MLD
+### Puis le MLD
 
 ![alt text](image-4.png)
 
-MLRD 
+### Le modele  relationnel (MLRD)
 
 ```r
 Sportifs (  #id_sportif,   nom_sportif,   prénom_sportif,   adresse_sportif,   ville_sportif,   code_postal_sportif,   pays_sportif,   numero_tel_sportif,   fax_sportif,   email_sportif,   numero_license_sportif,   nom_club_sportif,   numero_certificat_medical_sportif,   date_certificat_medical_sportif  )
@@ -137,3 +154,5 @@ Attribuer (  #id_sportif_Sportifs,    #numero_dossard_sportif_Inscription compé
 
 Contenir (  #id_competition_Compétitions,    #id_epreuves_Epreuves  )
 ```
+ 
+ 
